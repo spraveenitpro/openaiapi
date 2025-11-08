@@ -24,7 +24,8 @@ def main():
         {"role": "system", "content": "You are a summarizer who can summarize text into bullet points."},
         {"role": "user", "content": f"Summarize this customer chat in 3 points {text}"},
     ],
-    max_completion_tokens=max_completion_tokens
+    max_completion_tokens=max_completion_tokens,
+    store=True
     )
 
     input_tokens =response_1.usage.prompt_tokens
@@ -36,7 +37,28 @@ def main():
     print (response_1.choices[0].message.content)
     print(f"Estimated cost: ${cost}")
     # Your code here
+    #get_chat_completions(client)
+    update_chat_completion(client)
 
+
+def get_chat_completions(client):
+    completions = client.chat.completions.list()
+    completions_list = list(completions)
+
+    if completions_list:
+        first_id = completions_list[0].id
+        first_completion = client.chat.completions.retrieve(completion_id=first_id)
+        print(first_completion)
+    else:
+        print("No completions found!")
+
+
+def update_chat_completion(client):
+    completions = client.chat.completions.list()
+    completions_list = list(completions)
+    first_id = completions_list[0].id
+    updated_completion = client.chat.completions.update(completion_id=first_id, metadata= {"foo": "bar"})
+    print(updated_completion.model_dump_json(indent=2))
 
 if __name__ == "__main__":
     main()
