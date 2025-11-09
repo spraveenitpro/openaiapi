@@ -1,5 +1,4 @@
-from openai import OpenAI
-from openai import RateLimitError, APIConnectionError, APITimeoutError
+from openai import OpenAI, RateLimitError, APIConnectionError, APITimeoutError
 from dotenv import load_dotenv
 from tenacity import (
     retry,
