@@ -2,12 +2,33 @@ from __future__ import annotations
 
 import types
 import unittest
+from functools import wraps
 from unittest import mock
 
 import stream_latency as sl
 
 
+def verbose_test(test_func):
+    """Decorator to announce test execution and outcome."""
+
+    @wraps(test_func)
+    def wrapper(self: unittest.TestCase, *args, **kwargs):
+        test_name = f"{self.__class__.__name__}.{test_func.__name__}"
+        print(f"Running {test_name}...")
+        try:
+            return_value = test_func(self, *args, **kwargs)
+        except Exception as exc:
+            print(f"{test_name} FAILED: {exc}")
+            raise
+        else:
+            print(f"{test_name} PASSED")
+            return return_value
+
+    return wrapper
+
+
 class TestComputeMetrics(unittest.TestCase):
+    @verbose_test
     def test_token_count(self) -> None:
         start = 0.0
         timestamps = [0.1, 0.15, 0.3]
@@ -21,6 +42,7 @@ class TestComputeMetrics(unittest.TestCase):
         self.assertEqual(metrics.token_count, 3)
         self.assertAlmostEqual(metrics.velocity, 10.0)  # 3 / 0.3
 
+    @verbose_test
     def test_single_token(self) -> None:
         start = 1.0
         timestamps = [1.25]
@@ -33,12 +55,14 @@ class TestComputeMetrics(unittest.TestCase):
         self.assertEqual(metrics.token_count, 1)
         self.assertAlmostEqual(metrics.velocity, 4.0)  # 1 / 0.25
 
+    @verbose_test
     def test_no_timestamps_raises(self) -> None:
         with self.assertRaises(ValueError):
             sl.compute_metrics(0.0, [])
 
 
 class TestEstimatedTokenOutput(unittest.TestCase):
+    @verbose_test
     def test_estimated_token_output_large(self) -> None:
         metrics = sl.compute_metrics(0.0, [0.1])
         self.assertTrue(metrics.estimated_token_output > 1000)
@@ -53,6 +77,7 @@ class TestMeasureLatency(unittest.TestCase):
 
         return dummy_openai
 
+    @verbose_test
     def test_latency_measurement(self) -> None:
         token_chunks = [
             {"choices": [{"delta": {"content": "Hello"}}]},
