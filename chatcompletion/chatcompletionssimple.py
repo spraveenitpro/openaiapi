@@ -15,10 +15,10 @@ with open("ticket.txt", "r", encoding="utf-8") as f:
 response_1 = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
-        {"role": "system", "content": "You are a summarizer who can summarize text into bullet points."},
+        {"role": "system", "content": "You are a helpful assistant"},
         {"role": "user", "content": "Help me write a tweet for our new Hazelnut Mocha brew.?"},
     ],
-    max_tokens=10
+    max_completion_tokens=50
 )
 
 
@@ -35,4 +35,4 @@ response_2 = client.chat.completions.create(
 
 )
 
-print (response_2.choices[0].message.content)
+print (response_1.choices[0].message.content)

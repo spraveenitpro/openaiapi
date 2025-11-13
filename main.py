@@ -1,5 +1,5 @@
 def main():
-    print("Hello from token-counter!")
+    print("Hello from openaiapi!")
 
 
 if __name__ == "__main__":
